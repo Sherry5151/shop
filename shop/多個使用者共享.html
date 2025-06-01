@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>共享平台 - 模擬首頁</title>
+  <style>
+    body {
+      font-family: 'Noto Serif TC', serif;
+      margin: 0;
+      padding: 0;
+      background-color: #e2f0e8;
+      color: #2f4f4f;
+    }
+    header {
+      background-color: #88b88a;
+      color: white;
+      padding: 24px 20px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .container {
+      padding: 30px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .intro-box, .item-list {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 30px;
+      margin-bottom: 30px;
+      line-height: 1.8;
+    }
+    .intro-box h2 {
+      font-weight: 600;
+      font-size: 1.8em;
+      color: #3b5d50;
+    }
+    .item-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .item {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px 20px 50px 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      transition: background-color 0.3s;
+      position: relative;
+    }
+    .item:hover {
+      background-color: #f4f8f6;
+    }
+    .item h3 {
+      margin: 0 0 5px 0;
+      color: #3b5d50;
+    }
+    .item .price {
+      font-weight: bold;
+      color: #28a745;
+    }
+    .item .desc {
+      color: #666;
+      font-style: italic;
+    }
+    .add-cart-button {
+      position: absolute;
+      right: 20px;
+      bottom: 15px;
+      background-color: #ffa726;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .add-cart-button:hover {
+      background-color: #fb8c00;
+    }
+    footer {
+      background-color: #55786e;
+      color: white;
+      text-align: center;
+      padding: 14px 10px;
+      margin-top: 40px;
+      font-size: 0.95em;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>共享平台模擬首頁</h1>
+    <p>這是一個模擬共享經濟的平台入口頁</p>
+  </header>
+
+  <div class="container">
+    <div class="intro-box">
+      <h2>歡迎來到共享平台</h2>
+      <p>在這裡您可以租借物品、共享資源，或提供自己的物品讓其他人使用。</p>
+      <p>請先登入或註冊以使用完整功能。</p>
+    </div>
+
+    <div class="item-list">
+      <h2>最新商品上架</h2>
+      <div id="publishedItemsContainer">
+        <p id="noItemsMessage" style="color: #999; font-style: italic;">目前沒有商品。</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 共用平台模擬系統
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const container = document.getElementById('publishedItemsContainer');
+      const noMessage = document.getElementById('noItemsMessage');
+      const currentUser = localStorage.getItem('marketCurrentUser');
+      let allItems = [];
+
+      if (currentUser) {
+        for (let key in localStorage) {
+          if (key.startsWith('userItems_')) {
+            const userItems = JSON.parse(localStorage.getItem(key)) || [];
+            allItems = allItems.concat(userItems);
+          }
+        }
+
+        if (allItems.length === 0) {
+          noMessage.style.display = 'block';
+        } else {
+          noMessage.style.display = 'none';
+          allItems.forEach(item => {
+            const link = document.createElement('a');
+            link.href = `item-detail.html?id=${item.id}`;
+            link.className = 'item-link';
+
+            const div = document.createElement('div');
+            div.classList.add('item');
+            div.innerHTML = `
+              <h3>${item.name}</h3>
+              <p><strong>分類:</strong> ${item.category}</p>
+              <p class="desc">${item.description}</p>
+              <p class="price">價格: $${item.price}</p>
+              <p>聯絡方式: ${item.contact}</p>
+              ${item.photo ? `<img src="${item.photo}" style="max-width:100%;margin-top:10px;border-radius:8px;">` : ''}
+              <button class="add-cart-button">🛒 加入購物車</button>
+            `;
+
+            div.querySelector('.add-cart-button').addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+              cart.push(item);
+              localStorage.setItem('cartItems', JSON.stringify(cart));
+              alert(`已將「${item.name}」加入購物車！`);
+            });
+
+            link.appendChild(div);
+            container.appendChild(link);
+          });
+        }
+      } else {
+        alert('請先登入');
+        window.location.href = '會員登入.html';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>忘記密碼</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #cbd8bc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .reset-box {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: bold;
+    }
+
+    input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #8fae7b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+	
+	button:hover {
+	  background-color: #7a9967; /* hover 時更深一點點 */
+	}
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .back-login {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .back-login a {
+      color: #7a9967;
+      font-weight: bold;
+      text-decoration: none;
+    }
+	
+    .back-login a:hover {
+	  color: #5e7e54; 
+    }
+  </style>
+</head>
+<body>
+  <div class="reset-box">
+    <h2>忘記密碼</h2>
+    <form onsubmit="recoverPassword(event)">
+      <label for="email">請輸入註冊時的 Email：</label>
+      <input type="email" id="email" required />
+      <button type="submit">查詢密碼</button>
+    </form>
+    <div id="msg" class="message"></div>
+    <div class="back-login">
+      <p><a href="會員登入.html">&lt;--返回登入頁面--&gt;</a></p>
+    </div>
+  </div>
+
+  <script>
+    function recoverPassword(event) {
+      event.preventDefault();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const msg = document.getElementById("msg");
+      msg.innerText = "";
+      msg.className = "message";
+
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      const user = users.find(u => u.email === email);
+
+      if (!user) {
+        msg.innerText = "查無此帳號，請確認 Email 是否正確。";
+        msg.classList.add("error");
+      } else {
+        msg.innerText = `您的密碼為：${user.password}`;
+        msg.classList.add("success");
+      }
+    }
+  </script>
+</body>
+</html>

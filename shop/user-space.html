@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的二手商品平台</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    .user-info {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #666;
+    }
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    form button {
+      background-color: #28a745;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+    form button:hover {
+      background-color: #218838;
+    }
+    .item {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background-color: #fafafa;
+    }
+    .item img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 10px;
+    }
+    .item button {
+      margin-top: 10px;
+      background-color: #dc3545;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .item button:hover {
+      background-color: #c82333;
+    }
+    .logout {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .logout button {
+      padding: 8px 20px;
+      background-color: #6c757d;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>歡迎來到您的二手商品空間</h1>
+    <div class="user-info" id="userInfo"></div>
+
+    <h2>發佈新商品</h2>
+    <form id="productForm">
+      <input type="text" id="itemName" placeholder="商品名稱" required />
+      <select id="category">
+        <option value="電子產品">電子產品</option>
+        <option value="書籍">書籍</option>
+        <option value="服飾">服飾</option>
+        <option value="家具">家具</option>
+        <option value="娛樂">娛樂</option>
+        <option value="其他">其他</option>
+      </select>
+      <textarea id="description" placeholder="商品描述" required></textarea>
+      <input type="number" id="price" placeholder="價格 ($)" required />
+      <input type="text" id="contact" placeholder="聯絡方式" required />
+      <input type="file" id="photo" accept="image/*" />
+      <button type="submit">發佈商品</button>
+    </form>
+
+    <h2>您的商品列表</h2>
+    <div id="itemList"></div>
+
+    <div class="logout">
+      <button onclick="goToMarketplace()">前往共享平台</button>
+      <button onclick="logout()">登出</button>
+    </div>
+  </div>
+
+  <script>
+    const currentUser = localStorage.getItem("marketCurrentUser");
+    if (!currentUser) {
+      alert("請先登入");
+      window.location.href = "會員登入.html";
+    }
+    document.getElementById("userInfo").innerText = `登入帳號：${currentUser}`;
+
+    const userKey = "userItems_" + currentUser;
+    const itemList = document.getElementById("itemList");
+    const productForm = document.getElementById("productForm");
+    const photoInput = document.getElementById("photo");
+
+    let imageBase64 = "";
+    photoInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          imageBase64 = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function loadItems() {
+      const items = JSON.parse(localStorage.getItem(userKey)) || [];
+      itemList.innerHTML = "";
+      items.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <strong>${item.name}</strong><br/>
+          分類：${item.category}<br/>
+          價格：$${item.price}<br/>
+          描述：${item.description}<br/>
+          聯絡方式：${item.contact}<br/>
+          ${item.photo ? `<img src="${item.photo}" alt="商品圖片">` : ""}
+          <button onclick="confirmRemoveItem('${item.id}')">❌下架商品</button>
+        `;
+        itemList.appendChild(div);
+      });
+    }
+
+    function confirmRemoveItem(id) {
+      if (confirm("確定要下架這項商品嗎？")) {
+        removeItem(id);
+      }
+    }
+
+    function removeItem(id) {
+      let items = JSON.parse(localStorage.getItem(userKey)) || [];
+      items = items.filter(item => item.id !== id);
+      localStorage.setItem(userKey, JSON.stringify(items));
+      loadItems();
+    }
+
+    productForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const newItem = {
+        id: "item" + Date.now(),
+        name: document.getElementById("itemName").value,
+        category: document.getElementById("category").value,
+        description: document.getElementById("description").value,
+        price: document.getElementById("price").value,
+        contact: document.getElementById("contact").value,
+        photo: imageBase64
+      };
+      const items = JSON.parse(localStorage.getItem(userKey)) || [];
+      items.push(newItem);
+      localStorage.setItem(userKey, JSON.stringify(items));
+      productForm.reset();
+      imageBase64 = "";
+      loadItems();
+    });
+
+    function logout() {
+      localStorage.removeItem("marketCurrentUser");
+      window.location.href = "會員登入.html";
+    }
+
+    function goToMarketplace() {
+      window.location.href = "多個使用者共享.html"; // ← 根據實際檔案名稱修改
+    }
+
+    loadItems();
+  </script>
+</body>
+</html>

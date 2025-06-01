@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>會員登入</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      margin: 0; padding: 0;
+      background-color: #cbd8bc;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .login {
+      background-color: #fff;
+      width: 350px;
+      padding: 30px 25px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .login h2 { text-align: center; font-weight: 900; margin-bottom: 25px; color: #333; }
+    .text p { margin: 0 0 5px 0; font-weight: bold; color: #555; }
+    .input { margin-bottom: 20px; position: relative; }
+    .input input[type="text"], .input input[type="password"] {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;
+    }
+    .input input.error { border-color: red; }
+    .error-text { color: red; font-size: 12px; position: absolute; top: 100%; left: 0; }
+    .password1 p { margin: 5px 0 0 0; font-size: 13px; color: #555; }
+    .password1 input[type="checkbox"] { margin-right: 5px; }
+    .login-button { margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .login-button button {
+      padding: 8px 20px;
+      border: none;
+      background-color: #8fae7b;
+      color: white;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .login-button button:hover { background-color: #7a9967; }
+    .login-button a { font-size: 15px; color: #FF3F33; text-decoration: none; }
+    .join { margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px; text-align: center; }
+    .join p { font-size: 15px; color: #333; margin: 5px 0; }
+    .join a {
+      text-decoration: none;
+      color: #7a9967;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+    .join a:hover { color: #5e7e54; }
+    .error-message { color: red; font-size: 13px; margin-bottom: 10px; text-align: center; }
+    .success-message { color: green; font-size: 13px; margin-bottom: 10px; text-align: center; }
+    footer { margin-top: 15px; font-size: 12px; color: #666; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="login">
+    <h2>會員登入</h2>
+    <div id="message" class="error-message"></div>
+    <form onsubmit="login(event)">
+      <div class="input">
+        <div class="text account"><p>Email :</p></div>
+        <input placeholder="請輸入帳號" name="username" id="username" type="text" autocomplete="off" onblur="validateEmail()">
+        <div id="email-error" class="error-text"></div>
+      </div>
+      <div class="input">
+        <div class="text password"><p>密碼 :</p></div>
+        <input placeholder="請輸入密碼" name="password" id="password" type="password" autocomplete="off" onblur="validatePassword()">
+        <div id="password-error" class="error-text"></div>
+      </div>
+      <div class="input password1">
+        <p><input type="checkbox" name="rememberme" id="rememberme" value="true">記住我的帳號密碼</p>
+      </div>
+      <div class="login-button">
+        <button type="submit">登入</button>
+        <a href="忘記密碼.html">忘記密碼?</a>
+      </div>
+    </form>
+    <div class="join">
+      <p>還沒有會員帳號，註冊帳號免費又容易</p>
+      <p><a href="會員註冊.html">&lt;--馬上申請會員--&gt;</a></p>
+    </div>
+  </div>
+  <footer>&copy; 2025 Your Company. All rights reserved.</footer>
+
+  <script>
+    function validateEmail() {
+      const emailInput = document.getElementById("username");
+      const errorText = document.getElementById("email-error");
+      const email = emailInput.value.trim();
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email) {
+        emailInput.classList.add("error");
+        errorText.textContent = "Email 不可為空";
+        return false;
+      } else if (!emailPattern.test(email)) {
+        emailInput.classList.add("error");
+        errorText.textContent = "Email 格式不正確";
+        return false;
+      } else {
+        emailInput.classList.remove("error");
+        errorText.textContent = "";
+        return true;
+      }
+    }
+
+    function validatePassword() {
+      const passwordInput = document.getElementById("password");
+      const errorText = document.getElementById("password-error");
+      const password = passwordInput.value.trim();
+      if (!password) {
+        passwordInput.classList.add("error");
+        errorText.textContent = "密碼不可為空";
+        return false;
+      } else {
+        passwordInput.classList.remove("error");
+        errorText.textContent = "";
+        return true;
+      }
+    }
+
+    window.onload = function () {
+      const remembered = JSON.parse(localStorage.getItem("rememberedUser"));
+      if (remembered) {
+        document.getElementById("username").value = remembered.username;
+        document.getElementById("password").value = remembered.password;
+        document.getElementById("rememberme").checked = true;
+      }
+    };
+
+    function login(event) {
+      event.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const messageBox = document.getElementById("message");
+
+      const isEmailValid = validateEmail();
+      const isPasswordValid = validatePassword();
+
+      if (!isEmailValid || !isPasswordValid) {
+        messageBox.textContent = "請修正欄位錯誤";
+        messageBox.className = "error-message";
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      const user = users.find(u => u.email === username);
+
+      if (!user) {
+        messageBox.textContent = "此帳號尚未註冊";
+        messageBox.className = "error-message";
+        return;
+      }
+
+      if (user.password !== password) {
+        messageBox.textContent = "帳號或密碼錯誤";
+        messageBox.className = "error-message";
+        return;
+      }
+
+      if (document.getElementById("rememberme").checked) {
+        localStorage.setItem("rememberedUser", JSON.stringify({ username, password }));
+      } else {
+        localStorage.removeItem("rememberedUser");
+      }
+
+      localStorage.setItem("currentUser", username);
+
+      let marketUsers = JSON.parse(localStorage.getItem("marketUsers") || "[]");
+      if (!marketUsers.some(u => u.email === username)) {
+        const oldUser = users.find(u => u.email === username);
+        if (oldUser) {
+          marketUsers.push(oldUser);
+          localStorage.setItem("marketUsers", JSON.stringify(marketUsers));
+        }
+      }
+
+      localStorage.setItem("marketCurrentUser", username);
+
+      messageBox.textContent = "登入成功，前往專屬平台...";
+      messageBox.className = "success-message";
+      setTimeout(() => {
+        window.location.href = "user-space.html";
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

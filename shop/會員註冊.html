@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>會員註冊</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #cbd8bc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .register-box {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 5px;
+      color: #555;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .hint {
+      font-size: 12px;
+      color: red;
+      opacity: 0;
+      height: 0;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .hint.visible {
+      opacity: 1;
+      height: auto;
+      margin-top: 4px;
+    }
+    .gender-options {
+      display: flex;
+      gap: 20px;
+      margin-top: 5px;
+    }
+    .gender-options label {
+      font-weight: normal;
+      color: #333;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #8fae7b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+	
+	button:hover {
+	  background-color: #7a9967; /* hover 時更深一點點 */
+	}
+	
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
+    .back-login {
+      margin-top: 10px;
+      text-align: left;
+      font-size: 14px;
+    }
+    .back-login a {
+      color: #7a9967;
+      font-weight: bold;
+      text-decoration: none;
+    }
+	
+    .back-login a:hover {
+	  text-decoration: underline;
+	  color: #5e7e54; 
+    }
+  </style>
+</head>
+<body>
+  <div class="register-box">
+    <h2>會員註冊</h2>
+    <form onsubmit="register(event)">
+      <label for="name">姓名：</label>
+      <input type="text" id="name" required />
+      <small class="hint" id="nameHint"></small>
+
+      <label>性別：</label>
+      <div class="gender-options">
+        <label><input type="radio" name="gender" value="男" required /> 男</label>
+        <label><input type="radio" name="gender" value="女" required /> 女</label>
+      </div>
+      <small class="hint" id="genderHint"></small>
+
+      <label for="birthday">生日：</label>
+      <input type="date" id="birthday" required />
+      <small class="hint" id="birthdayHint"></small>
+
+      <label for="id">身分證字號：</label>
+      <input type="text" id="id" placeholder="例如：A123456789" required />
+      <small class="hint" id="idHint"></small>
+
+      <label for="address">住址：</label>
+      <input type="text" id="address" required />
+      <small class="hint" id="addressHint"></small>
+
+      <label for="email">Email：</label>
+      <input type="email" id="email" required />
+      <small class="hint" id="emailHint"></small>
+
+      <label for="password">密碼：</label>
+      <input type="password" id="password" required />
+      <small id="passwordTip" class="hint">至少8字元、1個英文字母以上</small>
+
+      <label for="confirm">確認密碼：</label>
+      <input type="password" id="confirm" required />
+      <small class="hint" id="confirmHint"></small>
+
+      <div class="back-login">
+        <p><a href="會員登入.html">返回登入頁面</a></p>
+      </div>
+
+      <button type="submit">註冊</button>
+    </form>
+    <div id="msg" class="message"></div>
+  </div>
+
+  <script>
+    const nameEl = document.getElementById("name");
+    const idEl = document.getElementById("id");
+    const addressEl = document.getElementById("address");
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
+    const confirmEl = document.getElementById("confirm");
+    const passwordTipEl = document.getElementById("passwordTip");
+
+    const hint = (id, message) => {
+      const el = document.getElementById(id);
+      el.innerText = message;
+      el.classList.toggle("visible", message !== "");
+    };
+
+    nameEl.addEventListener("blur", () => {
+      hint("nameHint", nameEl.value.trim() ? "" : "請輸入姓名");
+    });
+
+    idEl.addEventListener("blur", () => {
+      const val = idEl.value.trim().toUpperCase();
+      const valid = /^[A-Z][12]\d{8}$/.test(val);
+      hint("idHint", valid ? "" : "請輸入正確格式");
+    });
+
+    addressEl.addEventListener("blur", () => {
+      const val = addressEl.value.trim();
+      const hasCity = val.includes("縣") || val.includes("市");
+      const hasDistrict = val.includes("鄉") || val.includes("鎮") || val.includes("區");
+      if (!val) {
+        hint("addressHint", "請輸入住址");
+      } else if (!hasCity || !hasDistrict) {
+        hint("addressHint", "住址必須包含縣/市與鄉/鎮/區");
+      } else {
+        hint("addressHint", "");
+      }
+    });
+
+    emailEl.addEventListener("blur", () => {
+      const valid = /^\S+@\S+\.\S+$/.test(emailEl.value.trim());
+      hint("emailHint", valid ? "" : "Email 格式錯誤");
+    });
+
+    passwordEl.addEventListener("blur", () => {
+      const val = passwordEl.value.trim();
+      if (!val) {
+        passwordTipEl.innerText = "請輸入密碼";
+        passwordTipEl.classList.add("visible");
+      } else if (!(/[A-Za-z]/.test(val) && val.length >= 8)) {
+        passwordTipEl.innerText = "至少8字元且1個英文字母以上";
+        passwordTipEl.classList.add("visible");
+      } else {
+        passwordTipEl.classList.remove("visible");
+      }
+    });
+
+    confirmEl.addEventListener("blur", () => {
+      const val = confirmEl.value.trim();
+      if (!val) {
+        hint("confirmHint", "請再次輸入密碼");
+      } else {
+        const match = passwordEl.value === confirmEl.value;
+        hint("confirmHint", match ? "" : "密碼不一致");
+      }
+    });
+
+    function register(e) {
+      e.preventDefault();
+      const msg = document.getElementById("msg");
+      msg.innerText = "";
+      msg.className = "message";
+
+      const gender = document.querySelector('input[name="gender"]:checked');
+      if (!gender) {
+        hint("genderHint", "請選擇性別");
+        return;
+      } else {
+        hint("genderHint", "");
+      }
+
+      const addressVal = addressEl.value.trim();
+      const addressValid = addressVal &&
+        (addressVal.includes("縣") || addressVal.includes("市")) &&
+        (addressVal.includes("鄉") || addressVal.includes("鎮") || addressVal.includes("區"));
+
+      const validators = [
+        nameEl.value.trim() !== "",
+        /^[A-Z][12]\d{8}$/.test(idEl.value.trim().toUpperCase()),
+        addressValid,
+        /^\S+@\S+\.\S+$/.test(emailEl.value.trim()),
+        /[A-Za-z]/.test(passwordEl.value) && passwordEl.value.length >= 8,
+        passwordEl.value === confirmEl.value
+      ];
+
+      if (validators.includes(false)) {
+        msg.innerText = "請填寫正確資料";
+        msg.classList.add("error");
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      if (users.some(u => u.email === emailEl.value.trim().toLowerCase())) {
+        msg.innerText = "此 Email 已被註冊";
+        msg.classList.add("error");
+        return;
+      }
+
+      users.push({
+        name: nameEl.value.trim(),
+        gender: gender.value,
+        birthday: document.getElementById("birthday").value,
+        id: idEl.value.trim().toUpperCase(),
+        address: addressVal,
+        email: emailEl.value.trim().toLowerCase(),
+        password: passwordEl.value
+      });
+      localStorage.setItem("users", JSON.stringify(users));
+
+      msg.innerText = "註冊成功，將導向登入頁面...";
+      msg.classList.add("success");
+      setTimeout(() => {
+        window.location.href = "會員登入.html";
+      }, 1500);
+    }
+
+    document.getElementById("birthday").max = new Date().toISOString().split("T")[0];
+  </script>
+</body>
+</html>
