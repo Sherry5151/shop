@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物品租借平台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        /* Flexbox for form layout */
+        .listing-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 20px; /* Space between grid items */
+        }
+
+        .listing-form-grid .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .listing-form-grid .form-group.full-width {
+            grid-column: 1 / -1; /* Make this group span all columns */
+        }
+
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: calc(100% - 20px); /* Adjusted to consider padding */
+            padding: 10px;
+            margin-bottom: 15px; /* Less margin as flexbox will handle spacing */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+        input[type="file"] {
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product-item {
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .product-item:hover {
+            transform: translateY(-5px);
+        }
+        .product-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            min-height: 150px;
+            object-fit: cover;
+        }
+        .product-item h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .product-item p {
+            color: #555;
+            font-size: 0.95em;
+        }
+        .product-item .price {
+            font-size: 1.2em;
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .product-item .status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .product-item.reserved {
+            background-color: #ffe0e0;
+            border-color: #ffc2c2;
+        }
+        .product-item.reserved .status {
+            color: #dc3545;
+        }
+        .rent-duration {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        /* 詳情頁面 */
+        .product-detail {
+            display: none;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+        .product-detail img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .product-detail h2 {
+            color: #0056b3;
+            text-align: left;
+        }
+        .product-detail p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        /* 下架按鈕樣式 */
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* 圖片預覽 */
+        #imagePreview {
+            margin-top: 15px;
+            text-align: center;
+        }
+        #imagePreview img {
+            max-width: 200px;
+            max-height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            display: none;
+        }
+        #imagePreview p {
+            color: #777;
+            font-size: 0.9em;
+        }
+        .return-home-btn {
+            display: block; /* Make it a block element to center with margin */
+            width: fit-content; /* Adjust width to content */
+            margin: 40px auto 20px auto; /* Top margin, auto horizontal, bottom margin */
+            background-color: #6c757d; /* A neutral gray color */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            text-decoration: none; /* Remove underline for anchor tag */
+        }
+
+        .return-home-btn:hover {
+            background-color: #5a6268; /* Darker shade on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>物品租借平台</h1>
+
+        <div class="section">
+            <h2>發佈你的租借物品</h2>
+            <form id="listingForm" class="listing-form-grid">
+                <div class="form-group">
+                    <label for="itemName">物品名稱：</label>
+                    <input type="text" id="itemName" name="itemName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="itemPrice">租借價格 (每日/NT$)：</label>
+                    <input type="number" id="itemPrice" name="itemPrice" min="0" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="itemDescription">物品描述：</label>
+                    <textarea id="itemDescription" name="itemDescription" rows="5" required></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="itemImageFile">上傳物品圖片：</label>
+                    <input type="file" id="itemImageFile" name="itemImageFile" accept="image/*">
+                    <div id="imagePreview">
+                        <img id="previewImage" src="#" alt="圖片預覽">
+                        <p id="noImageText">未選擇圖片</p>
+                    </div>
+                </div>
+
+                <div class="form-group full-width" style="text-align: center;">
+                    <button type="submit">發佈物品</button>
+                    <button type="button" id="viewMyListingsBtn">查看我的發佈</button>
+                </div>
+            </form>
+        </div>
+
+        <hr>
+
+        <div class="section" id="myListingsSection" style="display:none;">
+            <h2>我發佈的物品</h2>
+            <div id="myListingsContainer" class="product-grid">
+                </div>
+        </div>
+
+        <hr>
+
+        <div class="section">
+            <h2>所有可租借物品</h2>
+            <div id="allProductsContainer" class="product-grid">
+                <div class="product-item" data-product-id="1">
+                    <img src="https://via.placeholder.com/300x200?text=相機" alt="相機">
+                    <h3>專業單眼相機</h3>
+                    <p>適用於專業攝影，附多種鏡頭。</p>
+                    <p class="price">NT$ 500/日</p>
+                    <button class="view-detail-btn">查看詳情</button>
+                    <p class="status">可租借</p>
+                </div>
+                <div class="product-item" data-product-id="2">
+                    <img src="https://via.placeholder.com/300x200?text=露營帳篷" alt="露營帳篷">
+                    <h3>四人份露營帳篷</h3>
+                    <p>堅固耐用，適合家庭露營。</p>
+                    <p class="price">NT$ 300/日</p>
+                    <button class="view-detail-btn">查看詳情</button>
+                    <p class="status">可租借</p>
+                </div>
+                <div class="product-item reserved" data-product-id="3">
+                    <img src="https://via.placeholder.com/300x200?text=投影機" alt="投影機">
+                    <h3>高清迷你投影機</h3>
+                    <p>輕巧便攜，居家影音好幫手。</p>
+                    <p class="price">NT$ 250/日</p>
+                    <button class="view-detail-btn">查看詳情</button>
+                    <p class="status">已被預訂</p>
+                    <p class="rent-duration">租借至：2025/06/10</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-detail" id="productDetail">
+            <button id="backToProductsBtn">返回商品列表</button>
+            <h2 id="detailItemName"></h2>
+            <img id="detailItemImage" src="" alt="商品圖片">
+            <p><strong>描述：</strong> <span id="detailItemDescription"></span></p>
+            <p><strong>價格：</strong> <span id="detailItemPrice"></span></p>
+
+            <div id="rentDateSelection" style="display:none;">
+                <label for="rentStartDate">租借開始日期：</label>
+                <input type="date" id="rentStartDate" min="" required>
+                <label for="rentEndDate">租借結束日期：</label>
+                <input type="date" id="rentEndDate" required>
+                <p>預計租借時長：<span id="calculatedDuration">0</span> 天</p>
+            </div>
+
+            <button id="rentNowBtn">立即租借</button>
+            <p class="status" id="detailItemStatus"></p>
+            <p class="rent-duration" id="detailRentDuration"></p>
+        </div>
+
+    </div>
+
+    <a href="https://n5kiy2gr7f.mobirisesite.com/" class="return-home-btn">返回主畫面</a>
+
+    <script>
+        const listingForm = document.getElementById('listingForm');
+        const myListingsContainer = document.getElementById('myListingsContainer');
+        const allProductsContainer = document.getElementById('allProductsContainer');
+        const viewMyListingsBtn = document.getElementById('viewMyListingsBtn');
+        const myListingsSection = document.getElementById('myListingsSection');
+        const productDetail = document.getElementById('productDetail');
+        const backToProductsBtn = document.getElementById('backToProductsBtn');
+        const rentNowBtn = document.getElementById('rentNowBtn');
+        const itemImageFile = document.getElementById('itemImageFile');
+        const previewImage = document.getElementById('previewImage');
+        const noImageText = document.getElementById('noImageText');
+
+        const rentDateSelection = document.getElementById('rentDateSelection');
+        const rentStartDateInput = document.getElementById('rentStartDate');
+        const rentEndDateInput = document.getElementById('rentEndDate');
+        const calculatedDurationSpan = document.getElementById('calculatedDuration');
+
+        let products = [
+            { id: 1, name: '專業單眼相機', description: '適用於專業攝影，附多種鏡頭。', price: 500, image: 'https://via.placeholder.com/300x200?text=相機', reserved: false, owner: false, rentStartDate: null, rentEndDate: null },
+            { id: 2, name: '四人份露營帳篷', description: '堅固耐用，適合家庭露營。', price: 300, image: 'https://via.placeholder.com/300x200?text=露營帳篷', reserved: false, owner: false, rentStartDate: null, rentEndDate: null },
+            { id: 3, name: '高清迷你投影機', description: '輕巧便攜，居家影音好幫手。', price: 250, image: 'https://via.placeholder.com/300x200?text=投影機', reserved: true, owner: false, rentStartDate: '2025-06-01', rentEndDate: '2025-06-10' }
+        ];
+
+        let nextProductId = 4; // 用於新發佈商品的ID
+
+        // 圖片預覽功能
+        itemImageFile.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    noImageText.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.src = '#';
+                previewImage.style.display = 'none';
+                noImageText.style.display = 'block';
+            }
+        });
+
+        // 計算租借時長 (天數)
+        function calculateDuration() {
+            const startDate = new Date(rentStartDateInput.value);
+            const endDate = new Date(rentEndDateInput.value);
+
+            if (startDate && endDate && startDate <= endDate) {
+                const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                calculatedDurationSpan.textContent = diffDays;
+            } else {
+                calculatedDurationSpan.textContent = '0';
+            }
+        }
+
+        // 設定開始日期預設為今天，並限制結束日期不能早於開始日期
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0]; //YYYY-MM-DD
+        rentStartDateInput.value = todayString;
+        rentStartDateInput.min = todayString; // 開始日期不能早於今天
+
+        rentStartDateInput.addEventListener('change', function() {
+            rentEndDateInput.min = rentStartDateInput.value; // 結束日期不能早於開始日期
+            calculateDuration();
+        });
+        rentEndDateInput.addEventListener('change', calculateDuration);
+
+        // 渲染商品列表
+        function renderProducts(container, productList, isMyListings = false) {
+            container.innerHTML = '';
+            productList.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.classList.add('product-item');
+                if (product.reserved) {
+                    productItem.classList.add('reserved');
+                }
+                productItem.dataset.productId = product.id;
+
+                let imageSrc = product.image ? product.image : 'https://via.placeholder.com/300x200?text=無圖片';
+
+                let rentDurationHtml = '';
+                if (product.reserved && product.rentEndDate) {
+                    const endDate = new Date(product.rentEndDate);
+                    // 格式化日期為YYYY/MM/DD
+                    const formattedEndDate = `${endDate.getFullYear()}/${(endDate.getMonth() + 1).toString().padStart(2, '0')}/${endDate.getDate().toString().padStart(2, '0')}`;
+                    rentDurationHtml = `<p class="rent-duration">租借至：${formattedEndDate}</p>`;
+                }
+
+                productItem.innerHTML = `
+                    <img src="${imageSrc}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p class="price">NT$ ${product.price}/日</p>
+                    <button class="view-detail-btn">查看詳情</button>
+                    <p class="status">${product.reserved ? '已被預訂' : '可租借'}</p>
+                    ${rentDurationHtml}
+                `;
+
+                if (isMyListings && product.owner) {
+                    const removeButton = document.createElement('button');
+                    removeButton.classList.add('remove-btn');
+                    removeButton.textContent = '下架';
+                    removeButton.dataset.productId = product.id;
+                    productItem.appendChild(removeButton);
+                }
+
+                container.appendChild(productItem);
+            });
+        }
+
+        // 初始化渲染所有商品
+        renderProducts(allProductsContainer, products);
+
+        // 發佈物品表單提交
+        listingForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const itemName = document.getElementById('itemName').value;
+            const itemDescription = document.getElementById('itemDescription').value;
+            const itemPrice = parseInt(document.getElementById('itemPrice').value);
+            const selectedFile = itemImageFile.files[0];
+
+            let imageUrl = '';
+            if (selectedFile) {
+                imageUrl = previewImage.src;
+            }
+
+            const newProduct = {
+                id: nextProductId++,
+                name: itemName,
+                description: itemDescription,
+                price: itemPrice,
+                image: imageUrl,
+                reserved: false,
+                owner: true,
+                rentStartDate: null, // 新增的屬性
+                rentEndDate: null    // 新增的屬性
+            };
+
+            products.push(newProduct);
+            renderProducts(allProductsContainer, products);
+            renderProducts(myListingsContainer, products.filter(p => p.owner), true);
+
+            alert('物品發佈成功！');
+            listingForm.reset();
+            previewImage.src = '#';
+            previewImage.style.display = 'none';
+            noImageText.style.display = 'block';
+        });
+
+        // 查看我的發佈按鈕
+        viewMyListingsBtn.addEventListener('click', function() {
+            if (myListingsSection.style.display === 'none') {
+                myListingsSection.style.display = 'block';
+                renderProducts(myListingsContainer, products.filter(p => p.owner), true);
+            } else {
+                myListingsSection.style.display = 'none';
+            }
+        });
+
+        // 點擊商品查看詳情 或 下架按鈕
+        document.addEventListener('click', function(event) {
+            // 處理查看詳情
+            if (event.target.classList.contains('view-detail-btn')) {
+                const productId = parseInt(event.target.closest('.product-item').dataset.productId);
+                const selectedProduct = products.find(p => p.id === productId);
+
+                if (selectedProduct) {
+                    document.getElementById('detailItemName').textContent = selectedProduct.name;
+                    document.getElementById('detailItemImage').src = selectedProduct.image || 'https://via.placeholder.com/300x200?text=無圖片';
+                    document.getElementById('detailItemDescription').textContent = selectedProduct.description;
+                    document.getElementById('detailItemPrice').textContent = `NT$ ${selectedProduct.price}/日`;
+                    document.getElementById('detailItemStatus').textContent = selectedProduct.reserved ? '已被預訂' : '可租借';
+
+                    // 顯示或隱藏租借日期選擇器
+                    if (selectedProduct.reserved) {
+                        rentNowBtn.style.display = 'none';
+                        rentDateSelection.style.display = 'none';
+                        document.getElementById('detailItemStatus').style.color = '#dc3545';
+
+                        // 顯示詳情頁的租借時長
+                        if (selectedProduct.rentEndDate) {
+                            const endDate = new Date(selectedProduct.rentEndDate);
+                            const formattedEndDate = `${endDate.getFullYear()}/${(endDate.getMonth() + 1).toString().padStart(2, '0')}/${endDate.getDate().toString().padStart(2, '0')}`;
+                            document.getElementById('detailRentDuration').textContent = `租借至：${formattedEndDate}`;
+                            document.getElementById('detailRentDuration').style.display = 'block';
+                        } else {
+                            document.getElementById('detailRentDuration').style.display = 'none';
+                        }
+
+                    } else {
+                        rentNowBtn.style.display = 'block';
+                        rentDateSelection.style.display = 'block'; // 可租借時顯示日期選擇
+                        document.getElementById('detailItemStatus').style.color = '#28a745';
+                        document.getElementById('detailRentDuration').style.display = 'none'; // 隱藏詳情頁的租借時長
+
+                        // 重置日期選擇器和計算
+                        rentStartDateInput.value = todayString;
+                        rentEndDateInput.value = ''; // 清空結束日期
+                        calculatedDurationSpan.textContent = '0';
+                        rentEndDateInput.min = todayString; // 確保結束日期限制正確
+                    }
+
+                    rentNowBtn.dataset.productId = productId;
+                    productDetail.style.display = 'block';
+                    allProductsContainer.closest('.section').style.display = 'none';
+                    myListingsSection.style.display = 'none';
+                }
+            }
+
+            // 處理下架按鈕
+            if (event.target.classList.contains('remove-btn')) {
+                const productIdToRemove = parseInt(event.target.dataset.productId);
+                products = products.filter(p => p.id !== productIdToRemove);
+
+                alert('物品已成功下架！');
+
+                renderProducts(allProductsContainer, products);
+                renderProducts(myListingsContainer, products.filter(p => p.owner), true);
+            }
+        });
+
+        // 返回商品列表
+        backToProductsBtn.addEventListener('click', function() {
+            productDetail.style.display = 'none';
+            allProductsContainer.closest('.section').style.display = 'block';
+        });
+
+        // 立即租借按鈕
+        rentNowBtn.addEventListener('click', function() {
+            const productIdToRent = parseInt(this.dataset.productId);
+            const productToRent = products.find(p => p.id === productIdToRent);
+
+            const rentStartDate = rentStartDateInput.value;
+            const rentEndDate = rentEndDateInput.value;
+
+            if (!rentStartDate || !rentEndDate) {
+                alert('請選擇租借開始和結束日期！');
+                return;
+            }
+
+            const start = new Date(rentStartDate);
+            const end = new Date(rentEndDate);
+
+            if (start > end) {
+                alert('結束日期不能早於開始日期！');
+                return;
+            }
+
+            if (productToRent && !productToRent.reserved) {
+                productToRent.reserved = true;
+                productToRent.rentStartDate = rentStartDate; // 儲存租借開始日期
+                productToRent.rentEndDate = rentEndDate;    // 儲存租借結束日期
+
+                alert(`您已成功租借 "${productToRent.name}"！\n租借期間：${rentStartDate} 至 ${rentEndDate}`);
+
+                renderProducts(allProductsContainer, products);
+                renderProducts(myListingsContainer, products.filter(p => p.owner), true);
+                productDetail.style.display = 'none';
+                allProductsContainer.closest('.section').style.display = 'block';
+            } else if (productToRent.reserved) {
+                alert('抱歉，此商品已被預訂！');
+            }
+        });
+
+    </script>
+</body>
+</html>
