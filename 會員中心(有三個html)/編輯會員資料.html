@@ -1,0 +1,247 @@
+<!DOCTYPE html> 
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>編輯個人資料｜覓境</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", sans-serif;
+      background-color: #cbd8bc;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="date"], textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    textarea {
+      resize: none;
+      height: 80px;
+    }
+    .avatar-preview {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background-color: #eee;
+      border: 3px solid #ccc;
+      margin: 10px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #avatarImg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      display: none;
+    }
+    .avatar-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+      color: #888;
+      z-index: 2;
+    }
+    .avatar-actions {
+      margin-top: 10px;
+    }
+    .btn {
+      padding: 10px 20px;
+      background-color: #8fae7b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .btn:hover {
+      background-color: #7a9967;
+    }
+    .btn.remove {
+      background-color: #888;
+    }
+    .btn.save {
+      margin-top: 20px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: red;
+      opacity: 0;
+      height: 0;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .hint.visible {
+      opacity: 1;
+      height: auto;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>編輯個人資料</h2>
+
+    <div id="avatarPreview" class="avatar-preview">
+      <img id="avatarImg" src="https://via.placeholder.com/150?text=Avatar" />
+      <span id="avatarLabel" class="avatar-label">頭像</span>
+    </div>
+    <div class="avatar-actions">
+      <input type="file" id="avatarInput" accept="image/*" style="display:none" />
+      <button class="btn" onclick="triggerAvatarInput()">更換照片</button>
+      <button class="btn remove" onclick="removeAvatar()">移除照片</button>
+    </div>
+
+    <div class="form-group">
+      <label for="name">姓名：</label>
+      <input type="text" id="name" />
+    </div>
+
+    <div class="form-group">
+      <label for="birthday">生日：</label>
+      <input type="date" id="birthday" required />
+      <small class="hint" id="birthdayHint"></small>
+    </div>
+
+    <div class="form-group">
+      <label for="intro">自我介紹：</label>
+      <textarea id="intro"></textarea>
+    </div>
+
+    <button class="btn save" onclick="saveProfile()">儲存</button>
+  </div>
+
+  <script>
+    let user = {};
+    let users = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+      user = JSON.parse(localStorage.getItem("currentUser")) || {};
+      users = JSON.parse(localStorage.getItem("users")) || [];
+
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("birthday").setAttribute("max", today);
+
+      document.getElementById("name").value = user.name || "";
+      document.getElementById("birthday").value = user.birthday || "";
+      document.getElementById("intro").value = user.intro || "";
+
+      if (user.avatar && user.avatar.startsWith("data:image/")) {
+        document.getElementById("avatarImg").src = user.avatar;
+        document.getElementById("avatarImg").style.display = "block";
+        document.getElementById("avatarLabel").style.display = "none";
+      }
+
+      // ✅ 僅此處修改，其他不動
+      document.getElementById("avatarInput").addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const base64 = e.target.result;
+          const avatarImg = document.getElementById("avatarImg");
+          const avatarLabel = document.getElementById("avatarLabel");
+
+          avatarImg.src = base64;
+          avatarImg.style.display = "block";
+          avatarLabel.style.display = "none";
+
+          user.avatar = base64;
+          localStorage.setItem("currentUser", JSON.stringify(user));
+          localStorage.setItem("currentUserData", JSON.stringify(user));
+
+          const index = users.findIndex(u => u.email === user.email);
+          if (index !== -1) {
+            users[index].avatar = base64;
+            localStorage.setItem("users", JSON.stringify(users));
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    function triggerAvatarInput() {
+      const input = document.getElementById("avatarInput");
+      input.value = "";
+      input.click();
+    }
+
+    function removeAvatar() {
+      user.avatar = "";
+      document.getElementById("avatarImg").src = "https://via.placeholder.com/150?text=Avatar";
+      document.getElementById("avatarImg").style.display = "block";
+      document.getElementById("avatarLabel").style.display = "none";
+      document.getElementById("avatarInput").value = "";
+
+      localStorage.setItem("currentUser", JSON.stringify(user));
+      localStorage.setItem("currentUserData", JSON.stringify(user));
+
+      const index = users.findIndex(u => u.email === user.email);
+      if (index !== -1) {
+        users[index].avatar = "";
+        localStorage.setItem("users", JSON.stringify(users));
+      }
+    }
+
+    function saveProfile() {
+      user.name = document.getElementById("name").value.trim();
+      user.birthday = document.getElementById("birthday").value;
+      user.intro = document.getElementById("intro").value.trim();
+
+      localStorage.setItem("currentUser", JSON.stringify(user));
+
+      const index = users.findIndex(u => u.email === user.email);
+      if (index !== -1) {
+        users[index] = user;
+        localStorage.setItem("users", JSON.stringify(users));
+
+        // ✅ 用更新後的使用者完整資料同步 currentUserData
+        localStorage.setItem("currentUserData", JSON.stringify(users[index]));
+      }
+
+      alert("資料已儲存");
+      window.location.href = "會員中心.html";
+    }
+  </script>
+</body>
+</html>

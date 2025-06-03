@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>會員中心｜覓境</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", sans-serif;
+      background-color: #cbd8bc;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+    .avatar-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      text-align: center;
+    }
+    .avatar-wrapper {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background-color: #eee;
+      border: 3px solid #ccc;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .avatar {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+      border-radius: 50%;
+    }
+    .avatar-label {
+      position: absolute;
+      font-size: 14px;
+      color: #888;
+      text-align: center;
+      pointer-events: none;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .info-group {
+      margin-bottom: 15px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .info-label {
+      font-weight: bold;
+      color: #333;
+      width: 80px;
+    }
+    .info-value {
+      color: #555;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #8fae7b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #7a9967;
+    }
+    .btn.logout {
+      background-color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>會員中心</h2>
+    <div class="avatar-container">
+      <label for="avatarInput">
+        <div class="avatar-wrapper">
+          <img id="avatar" class="avatar" src="" >
+          <span class="avatar-label">頭像</span>
+        </div>
+      </label>
+      <input type="file" id="avatarInput" accept="image/*">
+    </div>
+    <div class="info-group"><span class="info-label">姓名：</span><span id="name" class="info-value"></span></div>
+    <div class="info-group"><span class="info-label">生日：</span><span id="birthday" class="info-value"></span></div>
+    <div class="info-group">
+      <span class="info-label">自我介紹：</span>
+      <span id="intro" class="info-value"></span>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn" onclick="goToEditProfile()">編輯</button>
+      <button class="btn logout" onclick="logout()">登出</button>
+    </div>
+  </div>
+
+<script>
+  const userData = JSON.parse(localStorage.getItem("currentUserData"));
+
+  if (!userData) {
+    alert("請先登入才能進入會員中心！");
+    window.location.href = "會員登入.html";
+  } else {
+    // 顯示使用者資料
+    document.getElementById("name").textContent = userData.name || "未填寫";
+    document.getElementById("birthday").textContent = userData.birthday || "未填寫";
+    document.getElementById("intro").textContent = userData.intro || "未填寫";
+
+    // 顯示頭像
+    const avatarImg = document.getElementById("avatar");
+    const avatarLabel = document.querySelector(".avatar-label");
+
+  if (userData.avatar && userData.avatar.startsWith("data:image/")) {
+  avatarImg.src = userData.avatar;
+  avatarImg.style.display = "block";
+  avatarLabel.style.display = "none";
+} else {
+  avatarImg.src = "https://via.placeholder.com/150?text=Avatar";
+  avatarImg.style.display = "block";
+  avatarLabel.style.display = "none";
+}
+
+
+    // 上傳頭像
+    document.getElementById("avatarInput").addEventListener("change", function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const base64 = e.target.result;
+        avatarImg.src = base64;
+        avatarImg.style.display = "block";
+        avatarLabel.style.display = "none";
+
+        // 更新 currentUserData
+        userData.avatar = base64;
+        localStorage.setItem("currentUserData", JSON.stringify(userData));
+
+        // 同步更新 users 陣列
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const index = users.findIndex(u => u.email === userData.email);
+        if (index !== -1) {
+          users[index].avatar = base64;
+          localStorage.setItem("users", JSON.stringify(users));
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function goToEditProfile() {
+    window.location.href = "編輯會員資料.html";
+  }
+
+  function logout() {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentUserData");
+    alert("已登出！");
+    window.location.href = "會員登入.html";
+  }
+</script>
+</body>
+</html>
