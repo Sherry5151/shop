@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>聯絡我們｜覓境</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", sans-serif;
+      background-color: #a1c7a3;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .contact-container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 1000px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+	
+	.contact-header {
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  position: relative;
+	  margin-bottom: 30px;
+	}
+
+	.contact-header h2 {
+	  margin: 0 auto;
+	  text-align: center;
+	  color: #2e6632;
+	  font-size: 24px;
+	}
+
+	.back-home-btn {
+	  position: absolute;
+	  left: 0;
+	  background-color: #548a58;
+	  color: white;
+	  padding: 8px 14px;
+	  border-radius: 6px;
+	  text-decoration: none;
+	  font-size: 14px;
+	  font-weight: bold;
+	  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	  transition: background-color 0.3s ease;
+	}
+
+	.back-home-btn:hover {
+	  background-color: #3c8040;
+	}
+
+
+
+	
+    h2 {
+      text-align: center;
+      color: #2e6632;
+      margin-bottom: 30px;
+    }
+
+    p {
+      color: #111;
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+
+    p strong {
+      color: #2e6632;
+    }
+
+    .form-map-wrapper {
+      display: flex;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .form-wrapper {
+      flex: 1;
+      background-color: #f8f8f8;
+      border-radius: 10px;
+      padding: 20px 25px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    .form-title {
+      font-size: 20px;
+      color: #2e6632;
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    form label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #2e6632;
+      outline: none;
+      box-shadow: 0 0 5px rgba(46, 102, 50, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    button {
+      background-color: #548a58;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #3c8040;
+      transition: background-color 0.3s ease;
+    }
+
+    .map-container {
+      flex: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      min-height: 400px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    @media (max-width: 768px) {
+      .form-map-wrapper {
+        flex-direction: column;
+      }
+      .map-container {
+        min-height: 300px;
+      }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* ===== 美化的彈出視窗樣式 ===== */
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, 0.3);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .popup-box {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: slideIn 0.3s ease-in-out;
+      max-width: 300px;
+    }
+
+    .popup-box p {
+      font-size: 18px;
+      color: #2e6632;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .popup-box button {
+      background-color: #2e6632;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .popup-box button:hover {
+      background-color: #3c8040;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="contact-container">
+	<div class="contact-header">
+	  <a href="https://n5kiy2gr7f.mobirisesite.com/" class="back-home-btn">← 返回首頁</a>
+	  <h2>聯絡我們 | CONTACT US</h2>
+	</div>
+    <p><strong>📍 聯絡地址：</strong>桃園市中壢區遠東路135號</p>
+    <p><strong>📧 Email：</strong>yzu@gmail.com</p>
+    <p><strong>☎️ 電話：</strong>(03) 123-4567</p>
+
+    <div class="form-map-wrapper">
+      <div class="form-wrapper">
+        <h3 class="form-title">填寫您的訊息</h3>
+        <form onsubmit="handleSubmit(event)">
+          <label for="name">姓名：</label>
+          <input type="text" id="name" name="name" required>
+
+          <label for="email">Email：</label>
+          <input type="email" id="email" name="email" placeholder="example@gmail.com" required>
+
+          <label for="message">訊息內容：</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+
+          <button type="submit">送出</button>
+        </form>
+
+        <!-- ✅ 彈出提示窗 -->
+        <div id="popup" class="popup-overlay">
+          <div class="popup-box">
+            <p>✅ 您的訊息已送出<br>我們會盡快回覆！</p>
+            <button onclick="goHome()">關閉</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <iframe 
+          src="https://www.google.com/maps?q=元智大學&hl=zh-TW&z=17&output=embed" 
+          allowfullscreen 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+
+    <footer>
+      © 2025 覓境｜尋你所覓，境在你心
+    </footer>
+  </div>
+
+  <script>
+    function handleSubmit(event) {
+      event.preventDefault();
+      document.getElementById("popup").style.display = "flex";
+      event.target.reset();
+    }
+
+    
+	function goHome() {
+	  window.location.href = "https://n5kiy2gr7f.mobirisesite.com/";
+	}
+  </script>
+</body>
+</html>
