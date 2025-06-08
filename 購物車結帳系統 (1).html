@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>完整購物流程</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 2em;
+      background-color: #f9f9f9;
+      color: #2e7d32;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: #ffffff;
+      padding: 2em;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .section {
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 1em;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.3em;
+    }
+    input, select {
+      padding: 0.5em;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    .progress {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2em;
+    }
+    .progress span {
+      width: 100%;
+      text-align: center;
+      position: relative;
+      color: #ccc;
+      font-weight: bold;
+    }
+    .progress span::before {
+      content: '';
+      display: block;
+      height: 4px;
+      background: #ddd;
+      position: absolute;
+      top: -10px;
+      left: 0;
+      right: 0;
+    }
+    .progress .active {
+      color: #2e7d32;
+    }
+    .progress .active::before {
+      background: #2e7d32;
+    }
+    button {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 0.6em 1.2em;
+      margin: 1em 0.5em 0 0;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background-color: #276c2c;
+    }
+    h2 {
+      color: #2e7d32;
+    }
+    .back-home-btn {
+      position: absolute;
+      left: 0;
+      background-color: #548a58;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+    }
+    .back-home-btn:hover {
+      background-color: #3c8040;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5em 0;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item button {
+      background-color: #d32f2f;
+      padding: 0.3em 0.6em;
+      font-size: 0.9em;
+    }
+    .cart-item button:hover {
+      background-color: #b71c1c;
+    }
+    #store-group a {
+      display: inline-block;
+      margin-top: 0.5em;
+      color: #0077cc;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="progress">
+      <span id="step1" class="active">購物車</span>
+      <span id="step2">填寫資料</span>
+      <span id="step3">確認</span>
+    </div>
+
+    <div id="cart" class="section active">
+      <h2>購物車</h2>
+      <ul id="cart-items"></ul>
+      <p>總金額：$<span id="cart-total">0</span></p>
+      <button onclick="nextStep('checkout')">下一步</button>
+    </div>
+
+    <div id="checkout" class="section">
+      <h2>填寫資料</h2>
+      <form id="checkout-form" onsubmit="event.preventDefault(); saveData();">
+        <div class="form-group">
+          <label>姓名：</label>
+          <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+          <label>手機號碼：</label>
+          <input type="tel" id="phone" required>
+        </div>
+        <div class="form-group">
+          <label>電子郵件：</label>
+          <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+          <label>付款方式：</label>
+          <select id="payment" onchange="updateDeliveryOptions()">
+            <option value="credit">信用卡</option>
+            <option value="atm">ATM 轉帳</option>
+            <option value="cod">貨到付款</option>
+          </select>
+        </div>
+        <div class="form-group" id="credit-group" style="display:none;">
+          <label>卡號：</label>
+          <input type="text" id="card-number" maxlength="16">
+          <label>到期日 (MM/YY)：</label>
+          <input type="text" id="card-exp" placeholder="MM/YY" pattern="\d{2}/\d{2}">
+          <label>安全碼：</label>
+          <input type="text" id="card-cvc" maxlength="4">
+        </div>
+        <div class="form-group" id="atm-group" style="display:none;">
+          <label>銀行代碼：</label>
+          <select id="bank-code">
+            <option value="004">004 台灣銀行</option>
+            <option value="005">005 土地銀行</option>
+            <option value="006">006 合作金庫</option>
+            <option value="007">007 第一銀行</option>
+            <option value="008">008 華南銀行</option>
+            <option value="009">009 彰化銀行</option>
+            <option value="011">011 上海商銀</option>
+            <option value="012">012 台北富邦</option>
+            <option value="013">013 國泰世華</option>
+            <option value="017">017 兆豐銀行</option>
+            <option value="021">021 花旗銀行</option>
+            <option value="822">822 中國信託</option>
+          </select>
+          <label>帳號：</label>
+          <input type="text" id="bank-account">
+        </div>
+        <div class="form-group">
+          <label>配送方式：</label>
+          <select id="delivery" onchange="updateDeliveryOptions()">
+            <option value="home">宅配到府</option>
+            <option value="711">7-11 取貨</option>
+          </select>
+        </div>
+        <div class="form-group" id="address-group">
+          <label>地址：</label>
+          <input type="text" id="address">
+        </div>
+        <div class="form-group" id="store-group">
+          <label>門市店號：</label>
+          <input type="text" id="store-code">
+          <label>門市店名：</label>
+          <input type="text" id="store-name">
+          <label>門市地址：</label>
+          <input type="text" id="store-address">
+          <a href="https://emap.pcsc.com.tw/emap.aspx#" target="_blank">查詢 7-11 門市地圖</a>
+        </div>
+        <button type="button" onclick="prevStep('cart')">上一步</button>
+        <button type="submit">下一步</button>
+      </form>
+    </div>
+
+    <div id="confirm" class="section">
+      <h2>訂單確認</h2>
+      <p>姓名：<span id="c-name"></span></p>
+      <p>手機：<span id="c-phone"></span></p>
+      <p>信箱：<span id="c-email"></span></p>
+      <p>付款方式：<span id="c-payment"></span></p>
+      <p>配送方式：<span id="c-delivery"></span></p>
+      <p id="confirm-address">地址：<span id="c-address"></span></p>
+      <p id="confirm-store">門市：<span id="c-store"></span></p>
+      <button onclick="prevStep('checkout')">上一步</button>
+      <button onclick="submitOrder()">提交訂單</button>
+      <button onclick="gohome()">返回首頁</button>
+    </div>
+  </div>
+
+  <script>
+    let cart = [
+      { name: '商品 A', price: 100 },
+      { name: '商品 B', price: 200 }
+    ];
+
+    function renderCart() {
+      const cartItems = document.getElementById('cart-items');
+      const cartTotal = document.getElementById('cart-total');
+      cartItems.innerHTML = '';
+      let total = 0;
+      cart.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'cart-item';
+        li.innerHTML = `<span>${item.name} - $${item.price}</span><button onclick="removeItem(${index})">刪除</button>`;
+        total += item.price;
+        cartItems.appendChild(li);
+      });
+      cartTotal.textContent = total;
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    function nextStep(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      updateProgress(id);
+    }
+
+    function prevStep(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      updateProgress(id);
+    }
+
+    function updateProgress(id) {
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('step3').classList.remove('active');
+      if (id === 'cart') document.getElementById('step1').classList.add('active');
+      if (id === 'checkout') document.getElementById('step2').classList.add('active');
+      if (id === 'confirm') document.getElementById('step3').classList.add('active');
+    }
+
+    function updateDeliveryOptions() {
+      const payment = document.getElementById('payment').value;
+      const delivery = document.getElementById('delivery');
+      const addressGroup = document.getElementById('address-group');
+      const storeGroup = document.getElementById('store-group');
+      const creditGroup = document.getElementById('credit-group');
+      const atmGroup = document.getElementById('atm-group');
+
+      if (payment === 'cod') {
+        delivery.value = '711';
+        delivery.disabled = true;
+        creditGroup.style.display = 'none';
+        atmGroup.style.display = 'none';
+      } else {
+        delivery.disabled = false;
+        creditGroup.style.display = payment === 'credit' ? 'block' : 'none';
+        atmGroup.style.display = payment === 'atm' ? 'block' : 'none';
+      }
+
+      if (delivery.value === 'home') {
+        addressGroup.style.display = 'block';
+        storeGroup.style.display = 'none';
+      } else {
+        addressGroup.style.display = 'none';
+        storeGroup.style.display = 'block';
+      }
+    }
+
+    function selectStore() {
+      window.open('https://emap.pcsc.com.tw/emap.aspx#', 'storeMap', 'width=800,height=600');
+    }
+
+    function saveData() {
+      const data = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        payment: document.getElementById('payment').value,
+        delivery: document.getElementById('delivery').value,
+        address: document.getElementById('address').value,
+        store: `(${document.getElementById('store-code').value}) ${document.getElementById('store-name').value} - ${document.getElementById('store-address').value}`
+      };
+      localStorage.setItem('checkoutData', JSON.stringify(data));
+      loadConfirmation();
+      nextStep('confirm');
+    }
+
+    function loadConfirmation() {
+      const data = JSON.parse(localStorage.getItem('checkoutData'));
+      document.getElementById('c-name').textContent = data.name;
+      document.getElementById('c-phone').textContent = data.phone;
+      document.getElementById('c-email').textContent = data.email;
+      document.getElementById('c-payment').textContent = data.payment;
+      document.getElementById('c-delivery').textContent = data.delivery;
+
+      // 顯示對應地址或門市
+      const addressBlock = document.getElementById('confirm-address');
+      const storeBlock = document.getElementById('confirm-store');
+      if (data.delivery === 'home') {
+        addressBlock.style.display = 'block';
+        storeBlock.style.display = 'none';
+        document.getElementById('c-address').textContent = data.address;
+      } else {
+        addressBlock.style.display = 'none';
+        storeBlock.style.display = 'block';
+        document.getElementById('c-store').textContent = data.store;
+      }
+    }
+
+    function submitOrder() {
+      alert('訂單已提交！');
+    }
+
+    function gohome() {
+      window.location.href = "https://n5kiy2gr7f.mobirisesite.com/";
+    }
+
+    window.onload = function () {
+      updateDeliveryOptions();
+      renderCart();
+    };
+  </script>
+</body>
+</html>
