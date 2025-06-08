@@ -9,11 +9,11 @@
       font-family: 'Noto Serif TC', serif;
       margin: 0;
       padding: 0;
-      background-color: #a1c7a3;
+      background-color: #e2f0e8;
       color: #2f4f4f;
     }
     header {
-      background-color: #2e8b57;
+      background-color: #88b88a;
       color: white;
       padding: 24px 20px;
       text-align: center;
@@ -37,16 +37,6 @@
       font-size: 1.8em;
       color: #3b5d50;
     }
-	.intro-box {
-	  background-color: #ffffff;
-	  border-radius: 10px;
-	  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-	  padding: 30px;
-	  margin-bottom: 30px;
-	  line-height: 1.8;
-	  text-align: center; /* 👈 加這行就能置中內容 */
-	}
-
     .item-link {
       text-decoration: none;
       color: inherit;
@@ -94,7 +84,7 @@
       background-color: #fb8c00;
     }
     footer {
-      background-color: #2e8b57;
+      background-color: #55786e;
       color: white;
       text-align: center;
       padding: 14px 10px;
@@ -119,32 +109,19 @@
     .back-button-container a:hover {
       background-color: #6a9b6a;
     }
-	.cart-button {
-  background-color: #ffa726;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-left: 10px; /* 讓它和回首頁有間距 */
-  transition: background-color 0.3s;
-}
-
-.cart-button:hover {
-  background-color: #fb8c00;
-}
-
   </style>
 </head>
 <body>
   <header>
-    <h1>覓境</h1>
+    <h1>共享平台模擬首頁</h1>
+    <p>這是一個模擬共享經濟的平台入口頁</p>
   </header>
 
   <div class="container">
     <div class="intro-box">
       <h2>歡迎來到共享平台</h2>
       <p>在這裡您可以租借物品、共享資源，或提供自己的物品讓其他人使用。</p>
+      <p>請先登入或註冊以使用完整功能。</p>
     </div>
 
     <div class="item-list">
@@ -156,13 +133,11 @@
   </div>
 
   <div class="back-button-container">
-  <a href="https://n5kiy2gr7f.mobirisesite.com/" class="back-button">🏠 回到首頁</a>
-  <a href="https://sherry5151.github.io/shop/%E8%B3%BC%E7%89%A9%E8%BB%8A%E7%B5%90%E5%B8%B3%E7%B3%BB%E7%B5%B1%20(1).html" class="cart-button">🛒 檢視購物車</a>
+    <a href="https://n5kiy2gr7f.mobirisesite.com/">🏠 回到首頁</a>
   </div>
-
   
   <footer>
-    &copy; 2025 共用平台系統
+    &copy; 2025 共用平台模擬系統
   </footer>
 
   <script>
@@ -170,9 +145,6 @@
       const container = document.getElementById('publishedItemsContainer');
       const noMessage = document.getElementById('noItemsMessage');
       const currentUser = localStorage.getItem('marketCurrentUser');
-	  const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-cart.push(item);
-localStorage.setItem('cartItems', JSON.stringify(cart));
       let allItems = [];
 
       if (currentUser) {
