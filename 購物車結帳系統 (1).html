@@ -242,7 +242,7 @@
         const li = document.createElement('li');
         li.className = 'cart-item';
         li.innerHTML = `<span>${item.name} - $${item.price}</span><button onclick="removeItem(${index})">刪除</button>`;
-        total += item.price;
+        total += parseFloat(item.price);
         cartItems.appendChild(li);
       });
       cartTotal.textContent = total;
