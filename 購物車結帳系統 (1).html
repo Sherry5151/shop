@@ -249,9 +249,10 @@
     }
 
     function removeItem(index) {
-      cart.splice(index, 1);
-      renderCart();
-    }
+  cart.splice(index, 1);
+  localStorage.setItem('cartItems', JSON.stringify(cart)); // ✅ 更新 localStorage
+  renderCart();
+}
 
     function nextStep(id) {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
