@@ -231,10 +231,7 @@
   </div>
 
   <script>
-    let cart = [
-      { name: '商品 A', price: 100 },
-      { name: '商品 B', price: 200 }
-    ];
+    let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
 
     function renderCart() {
       const cartItems = document.getElementById('cart-items');
